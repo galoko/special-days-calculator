@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Special Date Calculator</title>
+</head>
+<body>
+    <h1>Special Date Calculator</h1>
+    <p>Enter your birthday:</p>
+    <input type="date" id="birthday">
+    <button onclick="calculateDates()">Calculate</button>
+    <div id="results"></div>
+
+    <script>
+        // Load the saved birthday from localStorage
+        window.onload = function() {
+            const savedBirthday = localStorage.getItem('birthday');
+            if (savedBirthday) {
+                document.getElementById('birthday').value = savedBirthday;
+                calculateDates(); // Calculate dates immediately if birthday is saved
+            }
+        };
+
+        function calculateDates() {
+            const birthdayInput = document.getElementById('birthday');
+            const birthday = new Date(birthdayInput.value);
+            if (isNaN(birthday.getTime())) {
+                alert('Please enter a valid date.');
+                return;
+            }
+
+            // Save the birthday to localStorage
+            localStorage.setItem('birthday', birthdayInput.value);
+
+            let specialDates = "";
+
+            // Function to calculate age at a given date
+            function calculateAge(birthDate, otherDate) {
+                let tempBirthDate = new Date(birthDate.getTime()); // Local copy of birthDate
+                let years = otherDate.getFullYear() - tempBirthDate.getFullYear();
+                tempBirthDate.setFullYear(otherDate.getFullYear());
+                if (tempBirthDate > otherDate) {
+                    years--;
+                }
+                return years;
+            }
+
+            // Calculate powers of 2 up to 2^30 and within 150 years limit
+            for (let power = 0; power <= 30; power++) {
+                let days = Math.pow(2, power);
+                let milestoneDate = new Date(birthday.getTime());
+                milestoneDate.setDate(milestoneDate.getDate() + days);
+                let age = calculateAge(birthday, milestoneDate);
+                if (age <= 150) {
+                    specialDates += `2^${power} (${days} days): ${milestoneDate.toDateString()} (Age: ${age} years)<br>`;
+                }
+            }
+
+            // Calculate specific milestones within 150 years limit
+            const milestones = [10000, 11111, 12345, 20000, 22222, 23456, 25252, 30303, 31415, 33333, 34567, 40000, 44444, 50000, 60000, 70000, 80000, 90000, 100000];
+            milestones.forEach(function(milestone) {
+                let milestoneDate = new Date(birthday.getTime());
+                milestoneDate.setDate(milestoneDate.getDate() + milestone);
+                let age = calculateAge(birthday, milestoneDate);
+                if (age <= 150) {
+                    specialDates += `${milestone} days: ${milestoneDate.toDateString()} (Age: ${age} years)<br>`;
+                }
+            });
+
+            document.getElementById('results').innerHTML = specialDates;
+        }
+    </script>
+</body>
+</html>
